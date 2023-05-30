@@ -7,5 +7,5 @@
 * useEffect, useRef
 * подключение к серверу React
 
-## Ссылка на GitHub Pages: https://julia-papina.github.io/mesto-react/
+## Ссылка на GitHub Pages: 
 
