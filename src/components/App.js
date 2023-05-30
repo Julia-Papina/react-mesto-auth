@@ -11,9 +11,13 @@ import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
 import DeleteConfirmPopup from "./DeleteConfirmPopup";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import Register from "./Register";
+import Login from "./Login";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
-
+  const navigate = useNavigate();
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false); //переменные состояния
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
@@ -22,6 +26,7 @@ function App() {
   const [selectedCard, setSelectedCard] = React.useState({}); //стейт переменная для отображения большой картинки
   const [currentUser, setCurrentUser] = React.useState({}); 
   const [cards, setCards] = React.useState([]);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
  
 
   React.useEffect(() => {
@@ -127,14 +132,46 @@ function App() {
           })
           .catch((error) => console.log(`Ошибка: ${error}`))
       }
+
+      React.useEffect(() => {
+        if (isLoggedIn === true) {
+          navigate("/");
+        }
+      }, [isLoggedIn, navigate]);
+
+
+      function onLogin(){
+        setIsLoggedIn(true);
+      }
+      
+
+   
     
   return (
   <CurrentUserContext.Provider value={currentUser}>
   <div className="root">
     <div className="page">
+    <Routes>
+       <Route path="/sign-in" element={
+        <>
+          <Header title="Регистрация" route="/sign-up"/>
+          <Login onLogin={onLogin}/>
+        </>
+      }/>
+
+      <Route path="/sign-up" element={
+        <>
+          <Header title="Войти" route="/sign-in"/>
+          <Register />
+        </>
+      }/>
       
-      <Header />
-      <Main
+     <Route exact path="/" element={
+      <>
+      <Header title="Выйти" route="" />
+      <ProtectedRoute
+        component={Main}
+        isLoggedIn={isLoggedIn}
         onEditProfile={handleEditProfileClick} //пропсы Main
         onEditAvatar={handleEditAvatarClick}
         onAddPlace={handleAddPlaceClick}
@@ -142,9 +179,15 @@ function App() {
         onDeletedCard={setDeletedCard}   
         onCardClick={setSelectedCard}
         onCardLike={handleCardLike}
-        
         cards={cards}    
       />
+      <Footer />
+      </>
+      }/>
+       <Route path="*" element={
+       <Navigate to={isLoggedIn ? "/" : "/sign-in"}/>
+       } />
+      </Routes>
       <EditProfilePopup isOpen={isEditProfilePopupOpen} 
                       onClose={closeAllPopups}
                       onUpdateUser={handleUpdateUser} /> 
@@ -163,7 +206,7 @@ function App() {
    
       <ImagePopup card={selectedCard} onClose={closeAllPopups} />
         </div>
-         <Footer />
+         
        </div>
     </CurrentUserContext.Provider>
 
