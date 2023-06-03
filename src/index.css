@@ -49,6 +49,9 @@
 @import url(./blocks/popup/__error/popup__error.css);
 @import url(./blocks/popup/__error/_visible/popup__error_visible.css);
 @import url(./blocks/popup/__field/popup__field.css);
+@import url(./blocks/popup/__content/popup__content.css);
+@import url(./blocks/popup/__status/popup__status.css);
+@import url(./blocks/popup/__message/popup__message.css);
 
 @import url(./blocks/login/login.css);
 @import url(./blocks/login/__title/login__title.css);
@@ -57,6 +60,7 @@
 @import url(./blocks/login/__input/login__input.css);
 @import url(./blocks/login/__link/login__link.css);
 @import url(./blocks/login/__text/login__text.css);
+
 
 
 

@@ -15,6 +15,9 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Register from "./Register";
 import Login from "./Login";
 import ProtectedRoute from "./ProtectedRoute";
+import InfoTooltip from "./InfoTooltip";
+import success from "../images/success.svg";
+import reject from "../images/reject.svg";
 
 function App() {
   const navigate = useNavigate();
@@ -27,6 +30,9 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState({}); 
   const [cards, setCards] = React.useState([]);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [infoTooltip, setInfoTooltip] = React.useState(false);
+  const [popupTooltipImage, setPopupTooltipImage] = React.useState("");
+  const [popupTooltipTitle, setPopupTooltipTitle] = React.useState("");
  
 
   React.useEffect(() => {
@@ -133,6 +139,12 @@ function App() {
           .catch((error) => console.log(`Ошибка: ${error}`))
       }
 
+      function handlePopupCloseClick(evt) {
+        if (evt.target.classList.contains('popup_opened')) {
+          closeAllPopups();
+        }
+      }
+
       React.useEffect(() => {
         if (isLoggedIn === true) {
           navigate("/");
@@ -189,15 +201,15 @@ function App() {
        } />
       </Routes>
       <EditProfilePopup isOpen={isEditProfilePopupOpen} 
-                      onClose={closeAllPopups}
-                      onUpdateUser={handleUpdateUser} /> 
+                        onClose={closeAllPopups}
+                        onUpdateUser={handleUpdateUser} /> 
 
       <EditAvatarPopup isOpen={isEditAvatarPopupOpen} 
-                     onClose={closeAllPopups}
-                     onUpdateAvatar={handleUpdateAvatar} /> 
+                       onClose={closeAllPopups}
+                       onUpdateAvatar={handleUpdateAvatar} /> 
       <AddPlacePopup onAddPlace={handleAddPlaceSubmit}
-                   isOpen={isAddPlacePopupOpen}
-                   onClose={closeAllPopups} />  
+                     isOpen={isAddPlacePopupOpen}
+                     onClose={closeAllPopups} />  
       <DeleteConfirmPopup 
                       onClose={closeAllPopups}
                       isOpen={isDeleteConfirmPopupOpen}
@@ -205,6 +217,11 @@ function App() {
                       card={deletedCard}/>              
    
       <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+      <InfoTooltip image={popupTooltipImage}
+                   title={popupTooltipTitle}
+                   isOpen={infoTooltip}
+                   onCloseClick={handlePopupCloseClick}
+                   onClose={closeAllPopups}/>
         </div>
          
        </div>
