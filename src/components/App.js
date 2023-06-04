@@ -7,6 +7,7 @@ import Footer from './Footer'
 import ImagePopup from "./ImagePopup";
 import CurrentUserContext from "../contexts/CurrentUserContext";
 import api from '../utils/Api';
+import * as auth from '../utils/auth';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
@@ -33,13 +34,16 @@ function App() {
   const [infoTooltip, setInfoTooltip] = React.useState(false);
   const [popupTooltipImage, setPopupTooltipImage] = React.useState("");
   const [popupTooltipTitle, setPopupTooltipTitle] = React.useState("");
+  const [emailName, setEmailName] = React.useState(null);
  
 
+  //получение данных пользователя
   React.useEffect(() => {
     api.getProfile()
     .then((profileUserInfo) => setCurrentUser(profileUserInfo))
     .catch((error) => console.log(`Ошибка: ${error}`))
 
+    //получение карточек с сервера
     api.getInitialCards()
     .then((data) => {
        setCards(
@@ -68,15 +72,19 @@ function App() {
 
    }
 
+   function handleInfoTooltip() {
+    setInfoTooltip(true);
+  }
+
    //обработчик пропса onClose компонента PopupWithForm 
    function closeAllPopups() {
     setIsEditProfilePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsDeleteConfirmPopupOpen(false);
-    setDeletedCard({})
-    setSelectedCard({})
-
+    setDeletedCard({});
+    setSelectedCard({});
+    setInfoTooltip(false);
    }
 
     // Функция при клике на лайк
@@ -144,7 +152,7 @@ function App() {
           closeAllPopups();
         }
       }
-
+      
       React.useEffect(() => {
         if (isLoggedIn === true) {
           navigate("/");
@@ -152,9 +160,60 @@ function App() {
       }, [isLoggedIn, navigate]);
 
 
-      function onLogin(){
-        setIsLoggedIn(true);
+        //регистрация пользователя
+      function onRegister(email, password){
+        auth.register(email, password).then(() => {
+          setPopupTooltipImage(success);
+          setPopupTooltipTitle("Вы успешно зарегистрировались!");
+          navigate('/sign-in');
+        }).catch(() => {
+          setPopupTooltipImage(reject);
+          setPopupTooltipTitle("Что-то пошло не так! Попробуйте ещё раз.");
+        }).finally(handleInfoTooltip);
       }
+
+
+      //авторизация пользователя
+      function onLogin(email, password) {
+        auth.login(email, password).then((res) => {
+          localStorage.setItem("jwt", res.token);
+          setIsLoggedIn(true);
+          setEmailName(email);
+          navigate("/");
+        }).catch(() => {
+          setPopupTooltipImage(reject);
+          setPopupTooltipTitle("Что-то пошло не так! Попробуйте ещё раз.");
+          handleInfoTooltip();
+        });
+        }
+
+
+        React.useEffect(() => {
+          const jwt = localStorage.getItem("jwt");
+          if (jwt) {
+            auth.tokenUser(jwt).then((res) => {
+              if (res) {
+                setIsLoggedIn(true);
+                setEmailName(res.data.email);
+              }
+            }).catch((err) => {
+              console.log(err);
+            });
+          }
+        }, []);
+
+
+ 
+
+
+
+       //функция выхода
+        function onSignOut() {
+          setIsLoggedIn(false);
+          setEmailName(null);
+          navigate("/sign-in");
+          localStorage.removeItem("jwt");
+        }
       
 
    
@@ -174,16 +233,16 @@ function App() {
       <Route path="/sign-up" element={
         <>
           <Header title="Войти" route="/sign-in"/>
-          <Register />
+          <Register onRegister={onRegister} />
         </>
       }/>
       
      <Route exact path="/" element={
       <>
-      <Header title="Выйти" route="" />
+      <Header title="Выйти" mail={emailName} onClick={onSignOut} route="" />
       <ProtectedRoute
         component={Main}
-        isLoggedIn={isLoggedIn}
+        isLogged={isLoggedIn}
         onEditProfile={handleEditProfileClick} //пропсы Main
         onEditAvatar={handleEditAvatarClick}
         onAddPlace={handleAddPlaceClick}
