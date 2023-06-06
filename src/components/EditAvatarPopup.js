@@ -43,11 +43,5 @@ onClose={onClose}
 </fieldset>
 </PopupWithForm>
 )
-
-
 }
-
-
-
-
 export default EditAvatarPopup

@@ -1,8 +1,6 @@
 import React from "react";
 import { useState } from "react";
 
-
-
 function Login(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +18,6 @@ function Login(props) {
     props.onLogin(email, password);
 
 }
-
     return(
        <section className="login">
         <h2 className="login__title">Вход</h2>
@@ -43,6 +40,5 @@ function Login(props) {
         </form>
         </section>
     );
-
 }
 export default Login
